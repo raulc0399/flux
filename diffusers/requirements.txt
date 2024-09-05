@@ -1,0 +1,5 @@
+torch
+diffusers["torch"]
+transformers
+pillow
+accelerate
