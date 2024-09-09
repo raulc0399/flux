@@ -1,5 +1,6 @@
 import torch
 from diffusers import FluxPipeline
+from datetime import datetime
 
 pipe = FluxPipeline.from_pretrained("black-forest-labs/FLUX.1-dev", torch_dtype=torch.bfloat16) # can replace schnell with dev
 
@@ -18,4 +19,8 @@ out = pipe(
     width=1360,
     num_inference_steps=50,
 ).images[0]
-out.save("image.png")
+
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+output_path = f"../imgs/{timestamp}_flux_fp16.png"
+
+out.save(output_path)

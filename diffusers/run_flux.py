@@ -1,5 +1,6 @@
 import torch
 from diffusers import FluxPipeline
+from datetime import datetime
 
 prompt = """The image depicts a modern, minimalist two-story residential building with a white exterior. Its cuboid shape features clean lines and sharp angles, creating a sleek look.
 Large rectangular windows with dark frames punctuate both floors, some illuminated from within. A small balcony with thin black metal railings extends from the second floor. An external black metal staircase leads to the upper entrance, adding visual interest.
@@ -16,4 +17,8 @@ out = pipe(
     width=1360,
     num_inference_steps=50,
 ).images[0]
-out.save("image.png")
+
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+output_path = f"../imgs/{timestamp}_flux.png"
+
+out.save(output_path)

@@ -2,6 +2,7 @@ import torch
 from diffusers.utils import load_image
 from diffusers import FluxControlNetPipeline
 from diffusers import FluxControlNetModel
+from datetime import datetime
 
 control_image = load_image("../imgs/ctrl1024.jpg")
 prompt = """The image depicts a modern, minimalist two-story residential building with a white exterior. Its cuboid shape features clean lines and sharp angles, creating a sleek look.
@@ -28,4 +29,8 @@ image = pipe(
     guidance_scale=3.5,
     joint_attention_kwargs={"scale": 1}
 ).images[0]
-image.save("flux.png")
+
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+output_path = f"../imgs/{timestamp}_instantx.png"
+
+image.save(output_path)

@@ -3,6 +3,7 @@ from diffusers.utils import load_image
 
 from diffusers import FluxControlNetPipeline, FluxControlNetModel
 from diffusers.models import FluxMultiControlNetModel
+from datetime import datetime
 
 control_image_canny = load_image("../images/ctrl1024.jpg")
 control_mode_canny = 0
@@ -34,3 +35,8 @@ image = pipe(
     guidance_scale=3.5,
     generator=torch.manual_seed(42),
 ).images[0]
+
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+output_path = f"../imgs/{timestamp}_shakkerlabs.png"
+
+image.save(output_path)

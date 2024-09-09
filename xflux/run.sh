@@ -5,6 +5,9 @@ Large rectangular windows with dark frames punctuate both floors, some illuminat
 The building is part of a uniform row of similar structures on a gentle slope, ensuring unobstructed views for each unit. The scene is captured during golden hour, with warm light casting subtle shadows that accentuate the geometric forms and give the white exterior a slight cream tint in places.
 Well-maintained landscaping, including a manicured lawn with wildflowers and ornamental grasses, softens the stark architecture and integrates it with the natural surroundings.'
 
+timestamp=$(date +"%Y%m%d_%H%M%S")
+output_path="../imgs/${timestamp}_xflux.png"
+
  python3 main.py \
  --prompt "$PROMPT" \
  --image ../imgs/ctrl1024.jpg \
@@ -17,4 +20,5 @@ Well-maintained landscaping, including a manicured lawn with wildflowers and orn
  --num_steps 25 --true_gs 4 --guidance 4 \
  --use_lora --lora_weight 0.7 \
  --lora_repo_id XLabs-AI/flux-lora-collection \
- --lora_name realism_lora.safetensors
+ --lora_name realism_lora.safetensors \
+ --output_path "$output_path"
