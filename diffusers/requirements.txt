@@ -1,5 +1,6 @@
 torch
-diffusers["torch"]
+git+https://github.com/huggingface/diffusers
 transformers
 pillow
 accelerate
+peft
