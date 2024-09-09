@@ -7,9 +7,9 @@ Well-maintained landscaping, including a manicured lawn with wildflowers and orn
 
 output_path="../imgs/xflux.png"
 
- python3 main.py \
+python3 x-flux/main.py \
  --prompt "$PROMPT" \
- --image ../imgs/ctrl1024.jpg \
+ --image ../imgs/ctrl1024.jpeg \
  --control_type canny \
  --repo_id XLabs-AI/flux-controlnet-canny-v3 \
  --name flux-canny-controlnet-v3.safetensors \
