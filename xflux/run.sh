@@ -1,7 +1,12 @@
 #!/bin/bash
 
+PROMPT='The image depicts a modern, minimalist two-story residential building with a white exterior. Its cuboid shape features clean lines and sharp angles, creating a sleek look.
+Large rectangular windows with dark frames punctuate both floors, some illuminated from within. A small balcony with thin black metal railings extends from the second floor. An external black metal staircase leads to the upper entrance, adding visual interest.
+The building is part of a uniform row of similar structures on a gentle slope, ensuring unobstructed views for each unit. The scene is captured during golden hour, with warm light casting subtle shadows that accentuate the geometric forms and give the white exterior a slight cream tint in places.
+Well-maintained landscaping, including a manicured lawn with wildflowers and ornamental grasses, softens the stark architecture and integrates it with the natural surroundings.'
+
  python3 main.py \
- --prompt "cyberpank dining room, full hd, cinematic" \
+ --prompt "$PROMPT" \
  --image ../imgs/ctrl1024.jpg \
  --control_type canny \
  --repo_id XLabs-AI/flux-controlnet-canny-v3 \
