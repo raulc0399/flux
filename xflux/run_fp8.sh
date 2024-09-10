@@ -11,5 +11,10 @@ python3 x-flux/main.py \
  --prompt "$PROMPT" \
  --offload --model_type flux-dev-fp8 \
  --lora_repo_id XLabs-AI/flux-lora-collection --lora_name realism_lora.safetensors \
+ --image ../imgs/ctrl1024.jpeg \
+ --control_type canny \
+ --repo_id XLabs-AI/flux-controlnet-canny-v3 \
+ --name flux-canny-controlnet-v3.safetensors \
+ --use_controlnet \
  --guidance 4 \
  --save_path "$output_path"
