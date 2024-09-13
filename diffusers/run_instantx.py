@@ -17,9 +17,10 @@ controlnet = FluxControlNetModel.from_pretrained(controlnet_model, torch_dtype=t
 pipe = FluxControlNetPipeline.from_pretrained(
     base_model, controlnet=controlnet, torch_dtype=torch.bfloat16
 )
-pipe.load_lora_weights("XLabs-AI/flux-RealismLora")
-pipe.fuse_lora(lora_scale=1.1)
-pipe.to("cuda")
+# pipe.load_lora_weights("XLabs-AI/flux-RealismLora")
+# pipe.fuse_lora(lora_scale=1.1)
+# pipe.to("cuda")
+pipe.enable_model_cpu_offload()
 
 image = pipe(
     prompt,
