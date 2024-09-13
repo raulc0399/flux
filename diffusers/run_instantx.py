@@ -20,6 +20,13 @@ pipe = FluxControlNetPipeline.from_pretrained(
     base_model, controlnet=controlnet, torch_dtype=torch.bfloat16, device_map="balanced"
 )
 
+pipe.load_lora_weights("XLabs-AI/flux-RealismLora")
+pipe.fuse_lora(lora_scale=1.1)
+# pipe.to("cuda")
+# pipe.enable_model_cpu_offload()
+
+# quantization
+# to run quantization, uncomment the following lines, remove the to cuda:1 line and device_map="balanced" above
 # from https://github.com/sayakpaul/diffusers-torchao?tab=readme-ov-file#training-with-fp8
 # pipe.transformer.to(memory_format=torch.channels_last)
 # pipe.transformer = autoquant(torch.compile(pipe.transformer, mode='max-autotune', fullgraph=True), error_on_unseen=False)
@@ -28,11 +35,8 @@ pipe = FluxControlNetPipeline.from_pretrained(
 # quantize_(pipe.transformer, int8_weight_only())
 
 # quantize_(pipe.transformer, int8_dynamic_activation_int8_weight())
-
-pipe.load_lora_weights("XLabs-AI/flux-RealismLora")
-pipe.fuse_lora(lora_scale=1.1)
 # pipe.to("cuda")
-# pipe.enable_model_cpu_offload()
+# quantization end
 
 print(pipe.hf_device_map)
 print(controlnet.device);
