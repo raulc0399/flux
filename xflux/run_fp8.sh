@@ -9,12 +9,15 @@ output_path="../imgs/xflux.png"
 
 python3 x-flux/main.py \
  --prompt "$PROMPT" \
- --offload --model_type flux-dev-fp8 \
- --lora_repo_id XLabs-AI/flux-lora-collection --lora_name realism_lora.safetensors \
  --image ../imgs/ctrl1024.jpeg \
  --control_type canny \
  --repo_id XLabs-AI/flux-controlnet-canny-v3 \
  --name flux-canny-controlnet-v3.safetensors \
  --use_controlnet \
- --guidance 4 \
+ --offload --model_type flux-dev-fp8 \
+ --width 1024 --height 1024  --timestep_to_start_cfg 1 \
+ --num_steps 25 --true_gs 4 --guidance 4 \
+ --use_lora --lora_weight 0.7 \
+ --lora_repo_id XLabs-AI/flux-lora-collection \
+ --lora_name realism_lora.safetensors \
  --save_path "$output_path"
