@@ -3,6 +3,7 @@ from diffusers.utils import load_image
 from diffusers import FluxControlNetPipeline
 from diffusers import FluxControlNetModel
 from datetime import datetime
+from accelerate.utils import compute_module_sizes
 
 control_image = load_image("../imgs/ctrl1024.jpeg")
 prompt = """The image depicts a modern, minimalist two-story residential building with a white exterior. Its cuboid shape features clean lines and sharp angles, creating a sleek look.
@@ -13,14 +14,18 @@ Well-maintained landscaping, including a manicured lawn with wildflowers and orn
 base_model = "black-forest-labs/FLUX.1-dev"
 controlnet_model = "InstantX/FLUX.1-dev-controlnet-canny"
 
-controlnet = FluxControlNetModel.from_pretrained(controlnet_model, torch_dtype=torch.bfloat16)
+controlnet = FluxControlNetModel.from_pretrained(controlnet_model, torch_dtype=torch.bfloat16).to("cuda:1")
 pipe = FluxControlNetPipeline.from_pretrained(
-    base_model, controlnet=controlnet, torch_dtype=torch.bfloat16
+    base_model, controlnet=controlnet, torch_dtype=torch.bfloat16, device_map="balanced"
 )
-# pipe.load_lora_weights("XLabs-AI/flux-RealismLora")
-# pipe.fuse_lora(lora_scale=1.1)
+pipe.load_lora_weights("XLabs-AI/flux-RealismLora")
+pipe.fuse_lora(lora_scale=1.1)
 # pipe.to("cuda")
-pipe.enable_model_cpu_offload()
+# pipe.enable_model_cpu_offload()
+
+print(pipe.hf_device_map)
+print(controlnet.device);
+print(compute_module_sizes(controlnet, dtype=torch.bfloat16)[""])
 
 image = pipe(
     prompt,
