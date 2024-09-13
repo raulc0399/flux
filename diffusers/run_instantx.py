@@ -26,15 +26,23 @@ pipe.fuse_lora(lora_scale=1.1)
 # pipe.enable_model_cpu_offload()
 
 # quantization
-# to run quantization, uncomment the following lines, remove the to cuda:1 line and device_map="balanced" above
+# to run quantization, uncomment the one of the blocks of lines below, remove the to cuda:1 line and device_map="balanced" above
+
 # from https://github.com/sayakpaul/diffusers-torchao?tab=readme-ov-file#training-with-fp8
 # pipe.transformer.to(memory_format=torch.channels_last)
 # pipe.transformer = autoquant(torch.compile(pipe.transformer, mode='max-autotune', fullgraph=True), error_on_unseen=False)
 
 # https://gist.github.com/sayakpaul/e1f28e86d0756d587c0b898c73822c47
 # quantize_(pipe.transformer, int8_weight_only())
+# quantize_(pipe.text_encoder, int8_weight_only())
+# quantize_(pipe.text_encoder_2, int8_weight_only())
+# quantize_(pipe.vae, int8_weight_only())
 
 # quantize_(pipe.transformer, int8_dynamic_activation_int8_weight())
+# quantize_(pipe.text_encoder, int8_dynamic_activation_int8_weight())
+# quantize_(pipe.text_encoder_2, int8_dynamic_activation_int8_weight())
+# quantize_(pipe.vae, int8_dynamic_activation_int8_weight())
+
 # pipe.to("cuda")
 # quantization end
 
