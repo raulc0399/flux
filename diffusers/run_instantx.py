@@ -22,7 +22,7 @@ pipe = FluxControlNetPipeline.from_pretrained(
 
 # from https://github.com/sayakpaul/diffusers-torchao?tab=readme-ov-file#training-with-fp8
 # pipe.transformer.to(memory_format=torch.channels_last)
-# pipe.transformer = autoquant(torch.compile(pipe.transformer, mode='max-autotune', fullgraph=True))
+# pipe.transformer = autoquant(torch.compile(pipe.transformer, mode='max-autotune', fullgraph=True), error_on_unseen=False)
 
 # https://gist.github.com/sayakpaul/e1f28e86d0756d587c0b898c73822c47
 # quantize_(pipe.transformer, int8_weight_only())
