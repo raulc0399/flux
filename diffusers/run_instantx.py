@@ -4,7 +4,7 @@ from diffusers import FluxControlNetPipeline
 from diffusers import FluxControlNetModel
 from datetime import datetime
 
-control_image = load_image("../imgs/ctrl1024.jpg")
+control_image = load_image("../imgs/ctrl1024.jpeg")
 prompt = """The image depicts a modern, minimalist two-story residential building with a white exterior. Its cuboid shape features clean lines and sharp angles, creating a sleek look.
 Large rectangular windows with dark frames punctuate both floors, some illuminated from within. A small balcony with thin black metal railings extends from the second floor. An external black metal staircase leads to the upper entrance, adding visual interest.
 The building is part of a uniform row of similar structures on a gentle slope, ensuring unobstructed views for each unit. The scene is captured during golden hour, with warm light casting subtle shadows that accentuate the geometric forms and give the white exterior a slight cream tint in places.
