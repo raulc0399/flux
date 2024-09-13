@@ -1,0 +1,18 @@
+to allow the pipeline to run on multi-gpu use device_map="balanced" when initializing the pipeline
+
+the components in this pipeline are transformer, text encoder 1 and 2 and vae.
+to force the text encoders and vae on cuda:1, change _assign_components_to_devices (file: ./env/lib/python3.10/site-packages/diffusers/pipelines/pipeline_loading_utils.py)
+
+current_device_index += 1
+
+to
+
+if current_device_index ==0:
+    current_device_index += 1
+
+or set manually:
+
+device_id_component_mapping = {
+    0: ['transformer'],
+    1: ['text_encoder_2', 'text_encoder', 'vae']
+}
