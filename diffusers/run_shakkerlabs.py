@@ -30,9 +30,9 @@ image = pipe(
     control_mode=[control_mode_canny],
     width=width,
     height=height,
-    controlnet_conditioning_scale=[0.4],
-    num_inference_steps=24, 
-    guidance_scale=3.5,
+    controlnet_conditioning_scale=[1.0],
+    num_inference_steps=30, 
+    guidance_scale=4,
     generator=torch.manual_seed(42),
 ).images[0]
 

@@ -30,9 +30,9 @@ print(compute_module_sizes(controlnet, dtype=torch.bfloat16)[""])
 image = pipe(
     prompt,
     control_image=control_image,
-    controlnet_conditioning_scale=0.6,
-    num_inference_steps=28,
-    guidance_scale=3.5,
+    controlnet_conditioning_scale=1.0,
+    num_inference_steps=30,
+    guidance_scale=4,
     joint_attention_kwargs={"scale": 1}
 ).images[0]
 
