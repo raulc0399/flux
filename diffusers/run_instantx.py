@@ -4,6 +4,7 @@ from diffusers import FluxControlNetPipeline
 from diffusers import FluxControlNetModel
 from datetime import datetime
 from accelerate.utils import compute_module_sizes
+from torchao.quantization import quantize_, int8_weight_only, int8_dynamic_activation_int8_weight,  autoquant
 
 control_image = load_image("../imgs/ctrl1024.jpeg")
 prompt = """The image depicts a modern, minimalist two-story residential building with a white exterior. Its cuboid shape features clean lines and sharp angles, creating a sleek look.
@@ -18,6 +19,16 @@ controlnet = FluxControlNetModel.from_pretrained(controlnet_model, torch_dtype=t
 pipe = FluxControlNetPipeline.from_pretrained(
     base_model, controlnet=controlnet, torch_dtype=torch.bfloat16, device_map="balanced"
 )
+
+# from https://github.com/sayakpaul/diffusers-torchao?tab=readme-ov-file#training-with-fp8
+# pipe.transformer.to(memory_format=torch.channels_last)
+# pipe.transformer = autoquant(torch.compile(pipe.transformer, mode='max-autotune', fullgraph=True))
+
+# https://gist.github.com/sayakpaul/e1f28e86d0756d587c0b898c73822c47
+# quantize_(pipe.transformer, int8_weight_only())
+
+# quantize_(pipe.transformer, int8_dynamic_activation_int8_weight())
+
 pipe.load_lora_weights("XLabs-AI/flux-RealismLora")
 pipe.fuse_lora(lora_scale=1.1)
 # pipe.to("cuda")
