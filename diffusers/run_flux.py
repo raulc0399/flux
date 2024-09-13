@@ -8,7 +8,7 @@ Large rectangular windows with dark frames punctuate both floors, some illuminat
 The building is part of a uniform row of similar structures on a gentle slope, ensuring unobstructed views for each unit. The scene is captured during golden hour, with warm light casting subtle shadows that accentuate the geometric forms and give the white exterior a slight cream tint in places.
 Well-maintained landscaping, including a manicured lawn with wildflowers and ornamental grasses, softens the stark architecture and integrates it with the natural surroundings."""
 
-pipe = FluxPipeline.from_pretrained("black-forest-labs/FLUX.1-dev", torch_dtype=torch.bfloat16)
+pipe = FluxPipeline.from_pretrained("black-forest-labs/FLUX.1-dev", torch_dtype=torch.bfloat16, device_map="balanced")
 pipe.load_lora_weights("XLabs-AI/flux-RealismLora")
 pipe.fuse_lora(lora_scale=1.1)
 
@@ -25,6 +25,8 @@ pipe.fuse_lora(lora_scale=1.1)
 # quantize_(pipe.vae, int8_dynamic_activation_int8_weight())
 
 # pipe.to("cuda")
+
+print(pipe.hf_device_map)
 
 out = pipe(
     prompt=prompt,
