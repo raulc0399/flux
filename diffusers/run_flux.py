@@ -30,9 +30,9 @@ print(pipe.hf_device_map)
 
 out = pipe(
     prompt=prompt,
-    guidance_scale=3.5,
-    height=768,
-    width=1360,
+    guidance_scale=4,
+    height=1024,
+    width=1024,
     num_inference_steps=30,
 ).images[0]
 
