@@ -30,10 +30,7 @@ print(pipe.hf_device_map)
 print(controlnet.device);
 print(compute_module_sizes(controlnet, dtype=torch.bfloat16)[""])
 
-print(controlnet_union.device);
-print(compute_module_sizes(controlnet_union, dtype=torch.bfloat16)[""])
-
-width, height = control_mode_canny.size
+width, height = control_image_canny.size
 
 image = pipe(
     prompt, 
