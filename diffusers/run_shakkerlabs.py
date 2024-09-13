@@ -5,7 +5,7 @@ from diffusers.models import FluxMultiControlNetModel
 from datetime import datetime
 from accelerate.utils import compute_module_sizes
 
-control_image_canny = load_image("../images/ctrl1024.jpeg")
+control_image_canny = load_image("../imgs/ctrl1024.jpeg")
 control_mode_canny = 0
 
 prompt = """The image depicts a modern, minimalist two-story residential building with a white exterior. Its cuboid shape features clean lines and sharp angles, creating a sleek look.
