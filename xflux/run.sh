@@ -20,4 +20,5 @@ python3 x-flux/main.py \
  --use_lora --lora_weight 0.7 \
  --lora_repo_id XLabs-AI/flux-lora-collection \
  --lora_name realism_lora.safetensors \
- --save_path "$output_path"
+ --save_path "$output_path" \
+ --device "cuda:1" --two_gpus_pipeline
