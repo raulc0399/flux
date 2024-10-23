@@ -1,7 +1,7 @@
 # from https://huggingface.co/docs/diffusers/en/api/pipelines/flux#single-file-loading-for-the-fluxtransformer2dmodel
 
 import torch
-from os import mkdir
+import os
 
 from diffusers import FluxTransformer2DModel, FluxPipeline
 from transformers import T5EncoderModel, CLIPTextModel
@@ -11,7 +11,7 @@ output_dir = "./flux-dev-fp8"
 bfl_repo = "black-forest-labs/FLUX.1-dev"
 dtype = torch.bfloat16
 
-mkdir(output_dir)
+os.makedirs(output_dir, exist_ok=True)
 
 print("loading transformer")
 transformer = FluxTransformer2DModel.from_pretrained(bfl_repo, subfolder="transformer", torch_dtype=dtype)
