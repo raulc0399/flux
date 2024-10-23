@@ -1,3 +1,5 @@
+# from https://huggingface.co/docs/diffusers/en/api/pipelines/flux#single-file-loading-for-the-fluxtransformer2dmodel
+
 import torch
 from diffusers import FluxTransformer2DModel, FluxPipeline
 from transformers import T5EncoderModel, CLIPTextModel
@@ -7,12 +9,12 @@ bfl_repo = "black-forest-labs/FLUX.1-dev"
 dtype = torch.bfloat16
 
 transformer = FluxTransformer2DModel.from_single_file("https://huggingface.co/Kijai/flux-fp8/blob/main/flux1-dev-fp8.safetensors", torch_dtype=dtype)
-# quantize(transformer, weights=qfloat8)
-# freeze(transformer)
+quantize(transformer, weights=qfloat8)
+freeze(transformer)
 
 text_encoder_2 = T5EncoderModel.from_pretrained(bfl_repo, subfolder="text_encoder_2", torch_dtype=dtype)
-# quantize(text_encoder_2, weights=qfloat8)
-# freeze(text_encoder_2)
+quantize(text_encoder_2, weights=qfloat8)
+freeze(text_encoder_2)
 
 pipe = FluxPipeline.from_pretrained(bfl_repo, transformer=None, text_encoder_2=None, torch_dtype=dtype)
 pipe.transformer = transformer
