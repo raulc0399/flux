@@ -28,7 +28,7 @@ pipe = FluxControlNetPipeline.from_pretrained(
 
 print(pipe.hf_device_map)
 print(controlnet.device);
-print(compute_module_sizes(controlnet, dtype=torch.bfloat16)[""])
+# print(compute_module_sizes(controlnet, dtype=torch.bfloat16)[""])
 
 width, height = control_image_canny.size
 
