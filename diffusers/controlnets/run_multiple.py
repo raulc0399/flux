@@ -2,6 +2,7 @@ import torch
 from diffusers.utils import load_image
 from diffusers import FluxControlNetPipeline, FluxControlNetModel, FluxMultiControlNetModel
 from datetime import datetime
+import itertools
 import json
 import os
 
@@ -118,52 +119,59 @@ def ensure_params_dir():
 def main():
     ensure_params_dir()
 
+    image_index = 0
+
+    # Define all parameter combinations
+    prompts = [PROMPT, PROMPT1, PROMPT2]
+    base_configs = [
+        {'modes': [2]},           # depth only
+        {'modes': [0]},           # canny only
+        {'modes': [2, 0]},        # both controls
+        {'modes': [0, 2]},        # both controls
+    ]
+    conditioning_scales = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    inference_steps = [20, 30, 40]
+    guidance_scales = [3.5, 4.0]
+
+    # Generate all parameter combinations using itertools
+    param_combinations = itertools.product(
+        prompts,
+        base_configs,
+        conditioning_scales,
+        inference_steps,
+        guidance_scales
+    )
+
     control_images = get_control_images()
     
     for union_model in UNION_MODELS:
         try:
             pipe = load_pipeline(union_model)
     
-            prompts = [PROMPT, PROMPT1, PROMPT2]
-            base_configs = [
-                {'modes': [2]},           # depth only
-                {'modes': [0]},           # canny only
-                {'modes': [2, 0]},        # both controls
-                {'modes': [0, 2]},        # both controls
-            ]
-            
-            conditioning_scales = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-            inference_steps = [20, 30, 40]
-            guidance_scales = [3.5, 4.0]
-    
-            image_index = 0
-            for prompt in prompts:
-                for config in base_configs:
-                    for scale in conditioning_scales:
-                        for steps in inference_steps:
-                            for guidance in guidance_scales:
-                                try:
-                                    # For dual control, use same scale for both
-                                    if len(config['modes']) > 1:
-                                        config_scale = [scale] * len(config['modes'])
-                                    else:
-                                        config_scale = scale
-                                        
-                                    generate_image(
-                                        pipe,
-                                        control_images,
-                                        prompt,
-                                        config['modes'],
-                                        config_scale,
-                                        num_steps=steps,
-                                        guidance_scale=guidance,
-                                        image_index=image_index
-                                    )
-                                    image_index += 1
+            for prompt, config, scale, steps, guidance in param_combinations:
+                try:
+                    # For dual control, use same scale for both
+                    if len(config['modes']) > 1:
+                        config_scale = [scale] * len(config['modes'])
+                    else:
+                        config_scale = scale
+                        
+                    generate_image(
+                        pipe,
+                        control_images,
+                        prompt,
+                        config['modes'],
+                        config_scale,
+                        num_steps=steps,
+                        guidance_scale=guidance,
+                        image_index=image_index
+                    )
 
-                                except Exception as e:
-                                    print(f"Error generating image for config: {config}")
-                                    print(f"Error: {str(e)}")
+                    image_index += 1
+
+                except Exception as e:
+                    print(f"Error generating image for config: {config}")
+                    print(f"Error: {str(e)}")
                                     
         except Exception as e:
             print(f"Error loading model {union_model}")

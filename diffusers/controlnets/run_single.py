@@ -129,21 +129,21 @@ def main():
     conditioning_scales = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
     inference_steps = [20, 30, 40]
     guidance_scales = [3.5, 4.0]
+
+    # Generate all parameter combinations using itertools
+    param_combinations = itertools.product(
+        prompts,
+        conditioning_scales,
+        inference_steps,
+        guidance_scales
+    )
     
     for model in MODELS:
         try:
             pipe = load_pipeline(model)
             control_image = get_control_image(model)
-            
-            # Generate all parameter combinations
-            params = itertools.product(
-                prompts,
-                conditioning_scales,
-                inference_steps,
-                guidance_scales
-            )
-            
-            for prompt_text, cond_scale, steps, guidance in params:
+                        
+            for prompt_text, cond_scale, steps, guidance in param_combinations:
                 try:
                     generate_image(
                         pipe,
