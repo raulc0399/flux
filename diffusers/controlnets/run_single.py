@@ -123,7 +123,9 @@ def ensure_params_dir():
 
 def main():
     ensure_params_dir()
+
     image_counter = 0
+    
     # Parameter combinations
     prompts = [PROMPT, PROMPT1, PROMPT2]
     conditioning_scales = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
@@ -154,7 +156,9 @@ def main():
                         guidance,
                         image_counter
                     )
+
                     image_counter += 1
+
                 except Exception as e:
                     print(f"Error generating image for {model} with params: {cond_scale}, {steps}, {guidance}")
                     print(f"Error: {str(e)}")
