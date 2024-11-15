@@ -7,7 +7,7 @@ current_device_index += 1
 
 to
 
-if current_device_index ==0:
+if current_device_index == 0:
     current_device_index += 1
 
 or set manually:
