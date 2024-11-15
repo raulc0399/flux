@@ -81,7 +81,7 @@ def generate_image(pipe, control_images, prompt_text, control_modes, conditionin
         num_inference_steps=num_steps,
         guidance_scale=guidance_scale,
         generator=GENERATOR,
-        joint_attention_kwargs={"scale": 1}
+        # joint_attention_kwargs={"scale": 1}
     ).images[0]
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -129,6 +129,7 @@ def main():
                 {'modes': [2]},           # depth only
                 {'modes': [0]},           # canny only
                 {'modes': [2, 0]},        # both controls
+                {'modes': [0, 2]},        # both controls
             ]
             
             conditioning_scales = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]

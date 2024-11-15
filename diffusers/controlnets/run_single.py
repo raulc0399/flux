@@ -33,7 +33,6 @@ Architectural visualization style with photorealistic rendering, shallow depth o
 PROMPT2 = """Modern white townhouses arranged on a hillside at sunset. Minimalist cubic architecture with black metal staircases and balconies. Warm glowing windows and wild grasses with dandelions in the foreground.
 Natural lens flare and soft evening lighting. Architectural visualization style with photorealistic rendering."""
 
-
 def get_control_image(model_name):
     """Select appropriate control image based on model name"""
     control_images = {
@@ -90,8 +89,7 @@ def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_ste
     ).images[0]
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    model_name = pipe.controlnet._name_or_path.split('/')[-1]
-    
+        
     base_name = f"{timestamp}_{image_index:04d}"
 
     # Save image
@@ -100,7 +98,7 @@ def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_ste
     
     # Save parameters
     params = {
-        "model_name": model_name,
+        "model_name": pipe.controlnet._name_or_path,
         "conditioning_scale": conditioning_scale,
         "num_steps": num_steps,
         "guidance_scale": guidance_scale,
