@@ -5,15 +5,6 @@ from datetime import datetime
 from accelerate.utils import compute_module_sizes
 
 #  to try:
-# "Xlabs-AI/flux-controlnet-canny-diffusers",
-# "Xlabs-AI/flux-controlnet-depth-diffusers",
-# "jasperai/Flux.1-dev-Controlnet-Depth",
-# "jasperai/Flux.1-dev-Controlnet-Surface-Normals",
-# "promeai/FLUX.1-controlnet-lineart-promeai"
-# "Shakker-Labs/FLUX.1-dev-ControlNet-Depth"
-# "InstantX/FLUX.1-dev-controlnet-canny"
-
-# + multiple:
 # "Shakker-Labs/FLUX.1-dev-ControlNet-Union-Pro"
 # "InstantX/FLUX.1-dev-Controlnet-Union"
 
