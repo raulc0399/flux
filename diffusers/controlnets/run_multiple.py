@@ -100,7 +100,6 @@ def generate_image(pipe, control_images, prompt_text, control_modes, conditionin
         "num_steps": num_steps,
         "guidance_scale": guidance_scale,
         "image_path": image_path,
-        "control_images": [str(img.filename) for img in control_imgs],
         "prompt": prompt_text
     }
     
