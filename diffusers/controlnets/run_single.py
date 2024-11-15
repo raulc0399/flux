@@ -130,6 +130,16 @@ def main():
     inference_steps = [20, 30, 40]
     guidance_scales = [3.5, 4.0]
 
+    # Calculate total combinations
+    total_combinations = (
+        len(prompts) *
+        len(conditioning_scales) *
+        len(inference_steps) *
+        len(guidance_scales) *
+        len(MODELS)
+    )
+    print(f"Total combinations to generate: {total_combinations}")
+
     # Generate all parameter combinations using itertools
     param_combinations = itertools.product(
         prompts,
