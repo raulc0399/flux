@@ -36,9 +36,9 @@ Natural lens flare and soft evening lighting. Architectural visualization style 
 def get_control_image(model_name):
     """Select appropriate control image based on model name"""
     control_images = {
-        'depth': load_image("../imgs/control_images/control_image_depth.png"),
-        'canny': load_image("../imgs/control_images/control_image_edges.png"),
-        'normals': load_image("../imgs/control_images/control_image_normals.png")
+        'depth': ("control_image_depth.png", load_image("control_images/control_image_depth.png")),
+        'canny': ("control_image_edges.png", load_image("control_images/control_image_edges.png")),
+        'normals': ("control_image_normals.png", load_image("control_images/control_image_normals.png"))
     }
     
     if 'depth' in model_name.lower():
@@ -51,7 +51,7 @@ def get_control_image(model_name):
         return control_images['normals']
     else:
         print(f"Unknown control image for model: {model_name}")
-        return None
+        return None, None
 
 def load_pipeline(controlnet_model):
     """Load the pipeline with specified controlnet model"""
@@ -73,7 +73,7 @@ def load_pipeline(controlnet_model):
     
     return pipe
 
-def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_steps, guidance_scale, image_index):
+def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_steps, guidance_scale, image_index, control_image_name):
     """Generate image with specified parameters"""
     width, height = control_image.size
     
@@ -103,6 +103,7 @@ def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_ste
         "num_steps": num_steps,
         "guidance_scale": guidance_scale,
         "image_path": image_path,
+        "control_image": control_image_name,
         "prompt": prompt_text
     }
     
@@ -151,7 +152,7 @@ def main():
     for model in MODELS:
         try:
             pipe = load_pipeline(model)
-            control_image = get_control_image(model)
+            control_image_name, control_image = get_control_image(model)
                         
             for prompt_text, cond_scale, steps, guidance in param_combinations:
                 try:
@@ -162,7 +163,8 @@ def main():
                         cond_scale,
                         steps,
                         guidance,
-                        image_counter
+                        image_counter,
+                        control_image_name
                     )
 
                     image_counter += 1
