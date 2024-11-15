@@ -36,9 +36,9 @@ Natural lens flare and soft evening lighting. Architectural visualization style 
 def get_control_image(model_name):
     """Select appropriate control image based on model name"""
     control_images = {
-        'depth': load_image("../imgs/control_image_depth.png"),
-        'canny': load_image("../imgs/control_image_edges.png"),
-        'normals': load_image("../imgs/control_image_normals.png")
+        'depth': load_image("../imgs/control_images/control_image_depth.png"),
+        'canny': load_image("../imgs/control_images/control_image_edges.png"),
+        'normals': load_image("../imgs/control_images/control_image_normals.png")
     }
     
     if 'depth' in model_name.lower():

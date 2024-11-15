@@ -30,8 +30,8 @@ Natural lens flare and soft evening lighting. Architectural visualization style 
 def get_control_images():
     """Load control images"""
     return {
-        'depth': load_image("../imgs/control_image_depth.png"),
-        'canny': load_image("../imgs/control_image_edges.png")
+        'depth': load_image("../imgs/control_images/control_image_depth.png"),
+        'canny': load_image("../imgs/control_images/control_image_edges.png")
     }
 
 def load_pipeline(model_name):
