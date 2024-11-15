@@ -3,6 +3,8 @@ from diffusers.utils import load_image
 from diffusers import FluxControlNetPipeline, FluxControlNetModel
 from datetime import datetime
 import itertools
+import json
+import os
 
 MODELS = [
     "Xlabs-AI/flux-controlnet-canny-diffusers",
@@ -72,7 +74,7 @@ def load_pipeline(controlnet_model):
     
     return pipe
 
-def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_steps, guidance_scale):
+def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_steps, guidance_scale, image_index):
     """Generate image with specified parameters"""
     width, height = control_image.size
     
@@ -89,13 +91,40 @@ def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_ste
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     model_name = pipe.controlnet._name_or_path.split('/')[-1]
-    prompt_index = PROMPTS.index(prompt_text)
-    output_path = f"../imgs/{timestamp}_{model_name}_p{prompt_index}_c{conditioning_scale}_s{num_steps}_g{guidance_scale}.png"
+    prompt_index = prompts.index(prompt_text)
     
-    image.save(output_path)
-    print(f"Saved: {output_path}")
+    # Save image
+    image_path = f"../imgs/{timestamp}_{image_index:04d}.png"
+    image.save(image_path)
+    
+    # Save parameters
+    params = {
+        "model_name": model_name,
+        "prompt_index": prompt_index,
+        "prompt": prompt_text,
+        "conditioning_scale": conditioning_scale,
+        "num_steps": num_steps,
+        "guidance_scale": guidance_scale,
+        "image_path": image_path
+    }
+    
+    params_path = f"../imgs/params/{timestamp}_{image_index:04d}.json"
+    with open(params_path, 'w') as f:
+        json.dump(params, f, indent=2)
+    
+    print(f"Saved image: {image_path}")
+    print(f"Saved params: {params_path}")
+
+def ensure_params_dir():
+    """Create params directory if it doesn't exist"""
+    params_dir = "../imgs/params"
+    if not os.path.exists(params_dir):
+        os.makedirs(params_dir)
+    return params_dir
 
 def main():
+    ensure_params_dir()
+    image_counter = 0
     # Parameter combinations
     prompts = [PROMPT, PROMPT1, PROMPT2]
     conditioning_scales = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
@@ -123,8 +152,10 @@ def main():
                         prompt_text,
                         cond_scale,
                         steps,
-                        guidance
+                        guidance,
+                        image_counter
                     )
+                    image_counter += 1
                 except Exception as e:
                     print(f"Error generating image for {model} with params: {cond_scale}, {steps}, {guidance}")
                     print(f"Error: {str(e)}")
