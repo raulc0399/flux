@@ -91,29 +91,28 @@ def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_ste
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     model_name = pipe.controlnet._name_or_path.split('/')[-1]
-    prompt_index = prompts.index(prompt_text)
     
+    base_name = f"{timestamp}_{image_index:04d}"
+
     # Save image
-    image_path = f"../imgs/{timestamp}_{image_index:04d}.png"
+    image_path = f"../imgs/{base_name}.png"
     image.save(image_path)
     
     # Save parameters
     params = {
         "model_name": model_name,
-        "prompt_index": prompt_index,
-        "prompt": prompt_text,
         "conditioning_scale": conditioning_scale,
         "num_steps": num_steps,
         "guidance_scale": guidance_scale,
-        "image_path": image_path
+        "image_path": image_path,
+        "prompt": prompt_text,
     }
     
-    params_path = f"../imgs/params/{timestamp}_{image_index:04d}.json"
+    params_path = f"../imgs/params/{base_name}.json"
     with open(params_path, 'w') as f:
         json.dump(params, f, indent=2)
     
     print(f"Saved image: {image_path}")
-    print(f"Saved params: {params_path}")
 
 def ensure_params_dir():
     """Create params directory if it doesn't exist"""
