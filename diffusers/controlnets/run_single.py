@@ -105,12 +105,12 @@ def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_ste
         "num_steps": num_steps,
         "guidance_scale": guidance_scale,
         "image_path": image_path,
-        "prompt": prompt_text,
+        "prompt": prompt_text
     }
     
     params_path = f"../imgs/params/{base_name}.json"
     with open(params_path, 'w') as f:
-        json.dump(params, f, indent=2)
+        json.dump(params, f, indent=4, separators=(',\n', ': '))
     
     print(f"Saved image: {image_path}")
 
