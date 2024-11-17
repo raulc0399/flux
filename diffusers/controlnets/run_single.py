@@ -203,6 +203,6 @@ if __name__ == "__main__":
     model_index = sys.argv[1]
 
     if check_model_index(model_index):
-        main(model_index)
+        main(int(model_index))
     else:
         print("Index not valid")
