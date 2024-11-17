@@ -1,3 +1,4 @@
 *
 !.gitignore
+!control_images/
 !control_images/*
