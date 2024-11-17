@@ -5,6 +5,7 @@ from datetime import datetime
 import itertools
 import json
 import os
+import sys
 
 MODELS = [
     "Xlabs-AI/flux-controlnet-canny-diffusers",
@@ -118,7 +119,7 @@ def ensure_params_dir(model):
     params_dir = f"../imgs/{model}/params"
     os.makedirs(params_dir, exist_ok=True)
 
-def main():
+def main(model_index):
     image_counter = 0
     
     # Parameter combinations
@@ -126,6 +127,9 @@ def main():
     conditioning_scales = [0.7, 0.8, 0.9, 1.0]
     inference_steps = [20, 30, 40]
     guidance_scales = [3.5, 4.0]
+    # conditioning_scales = [0.8]
+    # inference_steps = [30]
+    # guidance_scales = [3.5]
 
     # Calculate total combinations
     total_combinations = (
@@ -145,42 +149,60 @@ def main():
         guidance_scales
     )
     
-    for model in MODELS:
-        try:
-            model_name = model.replace("/", "-")
-            ensure_params_dir(model_name)
+    model = MODELS[model_index]
+    try:
+        model_name = model.replace("/", "-")
+        ensure_params_dir(model_name)
 
-            pipe = load_pipeline(model)
-            control_image_name, control_image = get_control_image(model)
-                        
-            for prompt_text, cond_scale, steps, guidance in param_combinations:
-                try:
-                    generate_image(
-                        pipe,
-                        control_image,
-                        prompt_text,
-                        cond_scale,
-                        steps,
-                        guidance,
-                        image_counter,
-                        control_image_name,
-                        model_name
-                    )
-
-                    image_counter += 1
-
-                except Exception as e:
-                    print(f"Error generating image for {model} with params: {cond_scale}, {steps}, {guidance}")
-                    print(f"Error: {str(e)}")
-
-            # clear gpu
-            del pipe
-            torch.cuda.empty_cache()
+        pipe = load_pipeline(model)
+        control_image_name, control_image = get_control_image(model)
                     
-        except Exception as e:
-            print(f"Error loading model {model}")
-            print(f"Error: {str(e)}")
-            continue
+        for prompt_text, cond_scale, steps, guidance in param_combinations:
+            try:
+                generate_image(
+                    pipe,
+                    control_image,
+                    prompt_text,
+                    cond_scale,
+                    steps,
+                    guidance,
+                    image_counter,
+                    control_image_name,
+                    model_name
+                )
+
+                image_counter += 1
+
+            except Exception as e:
+                print(f"Error generating image for {model} with params: {cond_scale}, {steps}, {guidance}")
+                print(f"Error: {str(e)}")
+
+        # clear gpu
+        del pipe
+        torch.cuda.empty_cache()
+                
+    except Exception as e:
+        print(f"Error loading model {model}")
+        print(f"Error: {str(e)}")
+
+def check_model_index(index) -> bool:
+    try:
+        index = int(index)
+        if 0 <= index < len(MODELS):
+            return True
+        else:
+            return False
+    except ValueError:
+        return False
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) != 2:
+        print("Usage: python run_single.py <model index>")
+        exit()
+    
+    model_index = sys.argv[1]
+
+    if check_model_index(model_index):
+        main(model_index)
+    else:
+        print("Index not valid")
