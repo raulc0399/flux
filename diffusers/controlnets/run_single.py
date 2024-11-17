@@ -174,7 +174,7 @@ def main():
                     print(f"Error: {str(e)}")
 
             # clear gpu
-            del m
+            del pipe
             torch.cuda.empty_cache()
                     
         except Exception as e:
