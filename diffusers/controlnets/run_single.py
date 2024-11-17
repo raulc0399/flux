@@ -91,7 +91,7 @@ def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_ste
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
-    base_name = f"{timestamp}_{image_index:04d}"
+    base_name = f"{timestamp}_{image_index:04d}_c{conditioning_scale}_s{num_steps}_g{guidance_scale}"
 
     # Save image
     image_path = f"../imgs/{model_name}/{base_name}.png"
