@@ -94,7 +94,7 @@ def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_ste
     base_name = f"{timestamp}_{image_index:04d}"
 
     # Save image
-    image_path = f"../imgs/{base_name}.png"
+    image_path = f"../imgs/{model_name}/{base_name}.png"
     image.save(image_path)
     
     # Save parameters
@@ -108,22 +108,17 @@ def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_ste
         "prompt": prompt_text
     }
     
-    params_path = f"../imgs/params/{base_name}.json"
+    params_path = f"../imgs/{model_name}/params/{base_name}.json"
     with open(params_path, 'w') as f:
         json.dump(params, f, indent=4, separators=(',\n', ': '))
     
     print(f"Saved image: {image_path}")
 
-def ensure_params_dir():
-    """Create params directory if it doesn't exist"""
-    params_dir = "../imgs/params"
-    if not os.path.exists(params_dir):
-        os.makedirs(params_dir)
-    return params_dir
+def ensure_params_dir(model):
+    params_dir = f"../imgs/{model}/params"
+    os.makedirs(params_dir, exist_ok=True)
 
 def main():
-    ensure_params_dir()
-
     image_counter = 0
     
     # Parameter combinations
@@ -152,6 +147,9 @@ def main():
     
     for model in MODELS:
         try:
+            model_name = model.replace("/", "-")
+            ensure_params_dir(model_name)
+
             pipe = load_pipeline(model)
             control_image_name, control_image = get_control_image(model)
                         
@@ -166,7 +164,7 @@ def main():
                         guidance,
                         image_counter,
                         control_image_name,
-                        model
+                        model_name
                     )
 
                     image_counter += 1
