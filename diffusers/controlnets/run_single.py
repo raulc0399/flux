@@ -127,7 +127,7 @@ def main():
     
     # Parameter combinations
     prompts = [PROMPT, PROMPT1, PROMPT2]
-    conditioning_scales = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    conditioning_scales = [0.7, 0.8, 0.9, 1.0]
     inference_steps = [20, 30, 40]
     guidance_scales = [3.5, 4.0]
 
@@ -172,6 +172,10 @@ def main():
                 except Exception as e:
                     print(f"Error generating image for {model} with params: {cond_scale}, {steps}, {guidance}")
                     print(f"Error: {str(e)}")
+
+            # clear gpu
+            del m
+            torch.cuda.empty_cache()
                     
         except Exception as e:
             print(f"Error loading model {model}")
