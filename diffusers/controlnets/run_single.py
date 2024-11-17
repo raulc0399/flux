@@ -136,8 +136,7 @@ def main(model_index):
         len(prompts) *
         len(conditioning_scales) *
         len(inference_steps) *
-        len(guidance_scales) *
-        len(MODELS)
+        len(guidance_scales)
     )
     print(f"Total combinations to generate: {total_combinations}")
 
