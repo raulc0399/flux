@@ -126,7 +126,7 @@ def main():
     image_counter = 0
     
     # Parameter combinations
-    prompts = [PROMPT, PROMPT1, PROMPT2]
+    prompts = [PROMPT2]
     conditioning_scales = [0.7, 0.8, 0.9, 1.0]
     inference_steps = [20, 30, 40]
     guidance_scales = [3.5, 4.0]
