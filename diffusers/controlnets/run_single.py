@@ -73,7 +73,8 @@ def load_pipeline(controlnet_model):
     
     return pipe
 
-def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_steps, guidance_scale, image_index, control_image_name):
+def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_steps,
+                   guidance_scale, image_index, control_image_name, model_name):
     """Generate image with specified parameters"""
     width, height = control_image.size
     
@@ -98,7 +99,7 @@ def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_ste
     
     # Save parameters
     params = {
-        "model_name": pipe.controlnet._name_or_path,
+        "model_name": model_name,
         "conditioning_scale": conditioning_scale,
         "num_steps": num_steps,
         "guidance_scale": guidance_scale,
@@ -164,7 +165,8 @@ def main():
                         steps,
                         guidance,
                         image_counter,
-                        control_image_name
+                        control_image_name,
+                        model
                     )
 
                     image_counter += 1
