@@ -126,9 +126,9 @@ def main(model_index):
     
     # Parameter combinations
     prompts = [PROMPT3]
-    conditioning_scales = [0.7, 0.8, 0.9, 1.0]
+    conditioning_scales = [0.7, 0.8, 0.85, 0.9, 1.0]
     inference_steps = [20, 30, 40]
-    guidance_scales = [3.5, 4.0]
+    guidance_scales = [3.5, 4.0, 5.0]
     # conditioning_scales = [0.8]
     # inference_steps = [30]
     # guidance_scales = [3.5]
