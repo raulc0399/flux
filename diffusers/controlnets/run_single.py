@@ -77,7 +77,8 @@ def load_pipeline(controlnet_model):
     return pipe
 
 def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_steps,
-                   guidance_scale, image_index, control_image_name, model_name):
+                   guidance_scale, control_guidance_end,
+                   image_index, control_image_name, model_name):
     """Generate image with specified parameters"""
     width, height = control_image.size
     
@@ -89,12 +90,13 @@ def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_ste
         controlnet_conditioning_scale=conditioning_scale,
         num_inference_steps=num_steps,
         guidance_scale=guidance_scale,
+        control_guidance_end=control_guidance_end
         generator=GENERATOR,
     ).images[0]
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
-    base_name = f"{timestamp}_{image_index:04d}_c{conditioning_scale}_s{num_steps}_g{guidance_scale}"
+    base_name = f"{timestamp}_{image_index:04d}_c{conditioning_scale}_s{num_steps}_g{guidance_scale}_cge{control_guidance_end}"
 
     # Save image
     image_path = f"../imgs/{model_name}/{base_name}.png"
@@ -129,6 +131,7 @@ def main(model_index):
     conditioning_scales = [0.7, 0.8, 0.85, 0.9, 1.0]
     inference_steps = [20, 30, 40]
     guidance_scales = [3.5, 4.0, 5.0]
+    control_guidance_end_vals = [0.7, 0.8, 0.9, 1.0]
     # conditioning_scales = [0.8]
     # inference_steps = [30]
     # guidance_scales = [3.5]
@@ -138,7 +141,8 @@ def main(model_index):
         len(prompts) *
         len(conditioning_scales) *
         len(inference_steps) *
-        len(guidance_scales)
+        len(guidance_scales) *
+        len(control_guidance_end_vals)
     )
     print(f"Total combinations to generate: {total_combinations}")
 
@@ -147,7 +151,8 @@ def main(model_index):
         prompts,
         conditioning_scales,
         inference_steps,
-        guidance_scales
+        guidance_scales,
+        control_guidance_end_vals
     )
     
     model = MODELS[model_index]
@@ -158,7 +163,7 @@ def main(model_index):
         pipe = load_pipeline(model)
         control_image_name, control_image = get_control_image(model)
                     
-        for prompt_text, cond_scale, steps, guidance in param_combinations:
+        for prompt_text, cond_scale, steps, guidance, control_guidance_end in param_combinations:
             try:
                 generate_image(
                     pipe,
@@ -167,6 +172,7 @@ def main(model_index):
                     cond_scale,
                     steps,
                     guidance,
+                    control_guidance_end,
                     image_counter,
                     control_image_name,
                     model_name
