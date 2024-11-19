@@ -34,7 +34,7 @@ Architectural visualization style with photorealistic rendering, shallow depth o
 PROMPT2 = """Modern white townhouses arranged on a hillside at sunset. Minimalist cubic architecture with black metal staircases and balconies. Warm glowing windows and wild grasses with dandelions in the foreground.
 Natural lens flare and soft evening lighting. Architectural visualization style with photorealistic rendering."""
 
-PROMPT3=""""Architecture photography of a row of houses with a black staircase between the floors, sunny, white exterior, warm day, natural lens flare. the houses are on a private street, surronded by a clean lawn"""
+PROMPT3=""""Architecture photography of a row of houses with a black railings on the balcony, white exterior, warm sunny day, natural lens flare. the houses are on a private street, surronded by a clean lawn"""
 
 def get_control_image(model_name):
     """Select appropriate control image based on model name"""
