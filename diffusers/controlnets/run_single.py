@@ -90,7 +90,7 @@ def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_ste
         controlnet_conditioning_scale=conditioning_scale,
         num_inference_steps=num_steps,
         guidance_scale=guidance_scale,
-        control_guidance_end=control_guidance_end
+        control_guidance_end=control_guidance_end,
         generator=GENERATOR,
     ).images[0]
     
