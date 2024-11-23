@@ -117,7 +117,7 @@ def ensure_params_dir(model):
     params_dir = f"../imgs/{model}/params"
     os.makedirs(params_dir, exist_ok=True)
 
-def main():
+def main(model_index):
     ensure_params_dir()
 
     image_index = 0
@@ -140,8 +140,7 @@ def main():
         len(base_configs) * 
         len(conditioning_scales) * 
         len(inference_steps) * 
-        len(guidance_scales) * 
-        len(UNION_MODELS)
+        len(guidance_scales)
     )
     print(f"Total combinations to generate: {total_combinations}")
 
@@ -156,39 +155,60 @@ def main():
 
     control_images = get_control_images()
     
-    for union_model in UNION_MODELS:
-        try:
-            pipe = load_pipeline(union_model)
-    
-            for prompt, config, scale, steps, guidance in param_combinations:
-                try:
-                    # For dual control, use same scale for both
-                    if len(config['modes']) > 1:
-                        config_scale = [scale] * len(config['modes'])
-                    else:
-                        config_scale = scale
-                        
-                    generate_image(
-                        pipe,
-                        control_images,
-                        prompt,
-                        config['modes'],
-                        config_scale,
-                        num_steps=steps,
-                        guidance_scale=guidance,
-                        image_index=image_index
-                    )
+    model = UNION_MODELS[model_index]
+    try:
+        union_model = model.replace("/", "-")
+        ensure_params_dir(union_model)
 
-                    image_index += 1
+        pipe = load_pipeline(model)
 
-                except Exception as e:
-                    print(f"Error generating image for config: {config}")
-                    print(f"Error: {str(e)}")
-                                    
-        except Exception as e:
-            print(f"Error loading model {union_model}")
-            print(f"Error: {str(e)}")
-            continue
+        for prompt, config, scale, steps, guidance in param_combinations:
+            try:
+                # For dual control, use same scale for both
+                if len(config['modes']) > 1:
+                    config_scale = [scale] * len(config['modes'])
+                else:
+                    config_scale = scale
+                    
+                generate_image(
+                    pipe,
+                    control_images,
+                    prompt,
+                    config['modes'],
+                    config_scale,
+                    num_steps=steps,
+                    guidance_scale=guidance,
+                    image_index=image_index
+                )
+
+                image_index += 1
+
+            except Exception as e:
+                print(f"Error generating image for config: {config}")
+                print(f"Error: {str(e)}")
+                                
+    except Exception as e:
+        print(f"Error loading model {union_model}")
+        print(f"Error: {str(e)}")
+
+def check_model_index(index) -> bool:
+    try:
+        index = int(index)
+        if 0 <= index < len(MODELS):
+            return True
+        else:
+            return False
+    except ValueError:
+        return False
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) != 2:
+        print("Usage: python run_single.py <model index>")
+        exit()
+    
+    model_index = sys.argv[1]
+
+    if check_model_index(model_index):
+        main(int(model_index))
+    else:
+        print("Index not valid")
