@@ -119,8 +119,6 @@ def ensure_params_dir(model):
     os.makedirs(params_dir, exist_ok=True)
 
 def main(model_index):
-    ensure_params_dir()
-
     image_index = 0
 
     # Define all parameter combinations
