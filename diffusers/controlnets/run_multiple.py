@@ -5,6 +5,7 @@ from datetime import datetime
 import itertools
 import json
 import os
+import sys
 
 BASE_MODEL = "black-forest-labs/FLUX.1-dev"
 UNION_MODELS = [
@@ -194,7 +195,7 @@ def main(model_index):
 def check_model_index(index) -> bool:
     try:
         index = int(index)
-        if 0 <= index < len(MODELS):
+        if 0 <= index < len(UNION_MODELS):
             return True
         else:
             return False
