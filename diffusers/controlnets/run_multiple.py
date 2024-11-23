@@ -27,6 +27,8 @@ Architectural visualization style with photorealistic rendering, shallow depth o
 PROMPT2 = """Modern white townhouses arranged on a hillside at sunset. Minimalist cubic architecture with black metal staircases and balconies. Warm glowing windows and wild grasses with dandelions in the foreground.
 Natural lens flare and soft evening lighting. Architectural visualization style with photorealistic rendering."""
 
+PROMPT3="""Architecture photography of a row of houses with a black railings on the balcony, white exterior, warm sunny day, natural lens flare. the houses are on a private street, surronded by a clean lawn"""
+
 def get_control_images():
     """Load control images"""
     return {
@@ -56,7 +58,8 @@ def load_pipeline(model_name):
     
     return pipe
 
-def generate_image(pipe, control_images, prompt_text, control_modes, conditioning_scale, num_steps, guidance_scale, image_index):
+def generate_image(pipe, control_images, prompt_text, control_modes, conditioning_scale, num_steps,
+                   guidance_scale, image_index, model_name):
     """Generate image with specified parameters"""
     width, height = control_images['depth'].size
     
@@ -86,15 +89,15 @@ def generate_image(pipe, control_images, prompt_text, control_modes, conditionin
     ).images[0]
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    base_name = f"{timestamp}_{image_index:04d}"
+    base_name = f"{timestamp}_{image_index:04d}_c{conditioning_scale}_s{num_steps}_g{guidance_scale}"
     
     # Save image
-    image_path = f"../imgs/{base_name}.png"
+    image_path = f"../imgs/{model_name}/{base_name}.png"
     image.save(image_path)
     
     # Save parameters
     params = {
-        "model_name": pipe.controlnet._name_or_path,
+        "model_name": model_name,
         "control_modes": control_modes,
         "conditioning_scale": conditioning_scale,
         "num_steps": num_steps,
@@ -104,18 +107,15 @@ def generate_image(pipe, control_images, prompt_text, control_modes, conditionin
         "prompt": prompt_text
     }
     
-    params_path = f"../imgs/params/{base_name}.json"
+    params_path = f"../imgs/{model_name}/params/{base_name}.json"
     with open(params_path, 'w') as f:
         json.dump(params, f, indent=4, separators=(',\n', ': '))
     
     print(f"Saved image: {image_path}")
 
-def ensure_params_dir():
-    """Create params directory if it doesn't exist"""
-    params_dir = "../imgs/params"
-    if not os.path.exists(params_dir):
-        os.makedirs(params_dir)
-    return params_dir
+def ensure_params_dir(model):
+    params_dir = f"../imgs/{model}/params"
+    os.makedirs(params_dir, exist_ok=True)
 
 def main():
     ensure_params_dir()
@@ -123,15 +123,15 @@ def main():
     image_index = 0
 
     # Define all parameter combinations
-    prompts = [PROMPT, PROMPT1, PROMPT2]
+    prompts = [PROMPT3]
     base_configs = [
         {'modes': [2]},           # depth only
         {'modes': [0]},           # canny only
         {'modes': [2, 0]},        # both controls
         {'modes': [0, 2]},        # both controls
     ]
-    conditioning_scales = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-    inference_steps = [20, 30, 40]
+    conditioning_scales = [0.6, 0.8, 1.0]
+    inference_steps = [30, 40]
     guidance_scales = [3.5, 4.0]
 
     # Calculate total combinations
