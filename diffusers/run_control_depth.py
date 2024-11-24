@@ -34,4 +34,4 @@ image = pipe(
     num_inference_steps=50,
     guidance_scale=3.5,
 ).images[0]
-image.save("output_canny.png")
+image.save("output_depth.png")
