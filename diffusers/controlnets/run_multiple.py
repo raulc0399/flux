@@ -177,7 +177,8 @@ def main(model_index):
                     config_scale,
                     num_steps=steps,
                     guidance_scale=guidance,
-                    image_index=image_index
+                    image_index=image_index,
+                    model_name=union_model
                 )
 
                 image_index += 1
