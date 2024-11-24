@@ -8,3 +8,4 @@ sentencepiece
 protobuf
 torchao
 optimum-quanto
+controlnet_aux
