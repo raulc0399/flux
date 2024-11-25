@@ -9,6 +9,8 @@ from pathlib import Path
 BASE_MODEL = "black-forest-labs/FLUX.1-Canny-dev"
 INPUT_DIR = Path("../imgs/control_images")
 OUTPUT_DIR = Path("../imgs/flux-canny")
+INFERENCE_STEPS = [30, 40, 50]
+GUIDANCE_SCALES = [4, 7, 10, 30]
 PROMPT = "Modern minimalist house with sleek geometric designs. Large glass windows and sliding doors integrated into the architecture, featuring wood, white stucco, and dark metal finishes. Houses include clean lines, flat or slightly angled roofs, and landscaped surroundings with wooden decks, patios, or modern walkways. Emphasize contemporary lighting, open spaces, and a harmonious blend of natural materials and modern aesthetic"
 
 def ensure_output_dir():
@@ -34,19 +36,22 @@ def process_image(input_path, output_dir, processor, pipe):
     canny_output_path = output_dir / f"{input_name}_canny.png"
     canny_image.save(canny_output_path)
     
-    # Generate image with pipeline
-    generated_image = pipe(
-        prompt=PROMPT,
-        control_image=canny_image,
-        height=1024,
-        width=1024,
-        num_inference_steps=50,
-        guidance_scale=4.5,
-    ).images[0]
-    
-    # Save generated image
-    output_path = output_dir / f"{input_name}_generated.png"
-    generated_image.save(output_path)
+    # Generate images with different parameters
+    for steps in INFERENCE_STEPS:
+        for guidance in GUIDANCE_SCALES:
+            # Generate image with pipeline
+            generated_image = pipe(
+                prompt=PROMPT,
+                control_image=canny_image,
+                height=1024,
+                width=1024,
+                num_inference_steps=steps,
+                guidance_scale=guidance,
+            ).images[0]
+            
+            # Save generated image with parameters in filename
+            output_path = output_dir / f"{input_name}_steps{steps}_guidance{guidance}_generated.png"
+            generated_image.save(output_path)
 
 def main():
     # Create output directory
