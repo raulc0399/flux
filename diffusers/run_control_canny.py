@@ -10,12 +10,12 @@ control_image = load_image(
 
 print(control_image)
 
-# processor = CannyDetector()
-# control_image = processor(
-#     control_image, low_threshold=50, high_threshold=200, detect_resolution=1024, image_resolution=1024
-# )
+processor = CannyDetector()
+control_image = processor(
+    control_image, low_threshold=50, high_threshold=200, detect_resolution=1024, image_resolution=1024
+)
 
-# del processor
+del processor
 
 pipe = FluxControlPipeline.from_pretrained(
     "black-forest-labs/FLUX.1-Canny-dev",
@@ -32,6 +32,6 @@ image = pipe(
     height=1024,
     width=1024,
     num_inference_steps=50,
-    guidance_scale=3.5,
+    guidance_scale=4.5,
 ).images[0]
 image.save("output_canny.png")

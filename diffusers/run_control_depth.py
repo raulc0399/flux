@@ -1,5 +1,5 @@
 import torch
-from controlnet_aux import CannyDetector
+from controlnet_aux import DepthPreprocessor
 from diffusers import FluxControlPipeline
 from diffusers.utils import load_image
 
@@ -10,12 +10,10 @@ control_image = load_image(
 
 print(control_image)
 
-# processor = CannyDetector()
-# control_image = processor(
-#     control_image, low_threshold=50, high_threshold=200, detect_resolution=1024, image_resolution=1024
-# )
+processor = DepthPreprocessor.from_pretrained("LiheYoung/depth-anything-large-hf")
+control_image = processor(control_image)[0].convert("RGB")
 
-# del processor
+del processor
 
 pipe = FluxControlPipeline.from_pretrained(
     "black-forest-labs/FLUX.1-Depth-dev",
