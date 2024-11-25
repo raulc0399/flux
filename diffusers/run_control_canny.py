@@ -9,7 +9,7 @@ from pathlib import Path
 BASE_MODEL = "black-forest-labs/FLUX.1-Canny-dev"
 INPUT_DIR = Path("../imgs/control_images")
 OUTPUT_DIR = Path("../imgs/flux-canny")
-PROMPT = "Architecture photography of a row of houses with a black railings on the balcony, white exterior, warm sunny day, natural lens flare. the houses are on a private street, surronded by a clean lawn"
+PROMPT = "Modern minimalist house with sleek geometric designs. Large glass windows and sliding doors integrated into the architecture, featuring wood, white stucco, and dark metal finishes. Houses include clean lines, flat or slightly angled roofs, and landscaped surroundings with wooden decks, patios, or modern walkways. Emphasize contemporary lighting, open spaces, and a harmonious blend of natural materials and modern aesthetic"
 
 def ensure_output_dir():
     OUTPUT_DIR.mkdir(exist_ok=True)
