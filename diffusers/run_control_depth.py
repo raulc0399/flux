@@ -18,10 +18,11 @@ def ensure_output_dir():
     return OUTPUT_DIR
 
 def process_image(input_path, output_dir, processor, pipe):
+    print(f"Processing {input_path}")
+
     # Load and process image
     control_image = load_image(input_path)
-    print(f"Processing {input_path}")
-    
+        
     # Apply Depth detection
     depth_image = processor(control_image)[0].convert("RGB")
     
@@ -65,7 +66,7 @@ def main():
     for i in range(1, 7):
         input_path = INPUT_DIR / f"{i}.jpg"
         if input_path.exists():
-            process_image(input_path, output_dir, processor, pipe)
+            process_image(str(input_path), output_dir, processor, pipe)
     
     del processor, pipe
 
