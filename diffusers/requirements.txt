@@ -10,3 +10,4 @@ torchao
 optimum-quanto
 controlnet_aux
 mediapipe
+git+https://github.com/asomoza/image_gen_aux.git

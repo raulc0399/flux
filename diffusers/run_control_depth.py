@@ -1,6 +1,6 @@
 import os
 import torch
-from controlnet_aux import DepthPreprocessor
+from image_gen_aux import DepthPreprocessor
 from diffusers import FluxControlPipeline
 from diffusers.utils import load_image
 from pathlib import Path
