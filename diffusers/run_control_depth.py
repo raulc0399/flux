@@ -11,7 +11,7 @@ INPUT_DIR = Path("../imgs/control_images")
 OUTPUT_DIR = Path("../imgs/flux-depth")
 INFERENCE_STEPS = [30, 40, 50]
 GUIDANCE_SCALES = [4, 7, 10, 30]
-PROMPT = "Modern minimalist house with sleek geometric designs. Large glass windows and sliding doors integrated into the architecture, featuring wood, white stucco, and dark metal finishes. Houses include clean lines, flat or slightly angled roofs, and landscaped surroundings with wooden decks, patios, or modern walkways. Emphasize contemporary lighting, open spaces, and a harmonious blend of natural materials and modern aesthetic"
+PROMPT = "Modern minimalist three houses with sleek geometric designs. Large glass windows and sliding doors integrated into the architecture, featuring wood, white stucco, and dark metal finishes. Houses include clean lines, flat or slightly angled roofs, and landscaped surroundings with wooden decks, patios, or modern walkways. Emphasize contemporary lighting, open spaces, and a harmonious blend of natural materials and modern aesthetic"
 
 def ensure_output_dir():
     OUTPUT_DIR.mkdir(exist_ok=True)
@@ -30,7 +30,7 @@ def process_image(input_path, output_dir, processor, pipe):
     input_name = Path(input_path).stem
     depth_output_path = output_dir / f"{input_name}_depth.png"
     depth_image.save(depth_output_path)
-    
+
     # Generate images with different parameters
     for steps in INFERENCE_STEPS:
         for guidance in GUIDANCE_SCALES:
@@ -63,8 +63,13 @@ def main():
     print(f"Pipeline device map: {pipe.hf_device_map}")
     
     # Process all images
-    for i in range(1, 7):
-        input_path = INPUT_DIR / f"{i}.jpg"
+    if False:
+        for i in range(1, 7):
+            input_path = INPUT_DIR / f"{i}.jpg"
+            if input_path.exists():
+                process_image(str(input_path), output_dir, processor, pipe)
+    else:
+        input_path = INPUT_DIR / "control_image_depth.png"
         if input_path.exists():
             process_image(str(input_path), output_dir, processor, pipe)
     
