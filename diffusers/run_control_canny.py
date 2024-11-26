@@ -68,9 +68,14 @@ def main():
     )
     print(f"Pipeline device map: {pipe.hf_device_map}")
     
-    # Process all images
-    for i in range(1, 7):
-        input_path = INPUT_DIR / f"{i}.jpg"
+    if False:
+        # Process all images
+        for i in range(1, 7):
+            input_path = INPUT_DIR / f"{i}.jpg"
+            if input_path.exists():
+                process_image(str(input_path), output_dir, processor, pipe)
+    else:
+        input_path = INPUT_DIR / "one_normals.png"
         if input_path.exists():
             process_image(str(input_path), output_dir, processor, pipe)
     

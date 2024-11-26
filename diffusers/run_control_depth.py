@@ -69,7 +69,7 @@ def main():
             if input_path.exists():
                 process_image(str(input_path), output_dir, processor, pipe)
     else:
-        input_path = INPUT_DIR / "control_image_depth.png"
+        input_path = INPUT_DIR / "one_normals.png"
         if input_path.exists():
             process_image(str(input_path), output_dir, processor, pipe)
     
