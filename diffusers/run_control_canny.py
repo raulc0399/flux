@@ -75,8 +75,7 @@ def main():
             if input_path.exists():
                 process_image(str(input_path), output_dir, processor, pipe)
     else:
-        input_path = INPUT_DIR / "one_normals.png"
-        if input_path.exists():
+        for input_path in INPUT_DIR.glob("one_edges*.png"):
             process_image(str(input_path), output_dir, processor, pipe)
     
     del processor, pipe
