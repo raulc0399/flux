@@ -1,5 +1,7 @@
 import torch
 from diffusers.utils import load_image
+from controlnet_aux import CannyDetector
+from image_gen_aux import DepthPreprocessor
 from diffusers import FluxControlNetPipeline, FluxControlNetModel
 from datetime import datetime
 import itertools
@@ -34,14 +36,16 @@ Architectural visualization style with photorealistic rendering, shallow depth o
 PROMPT2 = """Modern white townhouses arranged on a hillside at sunset. Minimalist cubic architecture with black metal staircases and balconies. Warm glowing windows and wild grasses with dandelions in the foreground.
 Natural lens flare and soft evening lighting. Architectural visualization style with photorealistic rendering."""
 
-PROMPT3="""Architecture photography of a row of houses with a black railings on the balcony, white exterior, warm sunny day, natural lens flare. the houses are on a private street, surronded by a clean lawn"""
+# PROMPT3="""Architecture photography of a row of houses with a black railings on the balcony, white exterior, warm sunny day, natural lens flare. the houses are on a private street, surronded by a clean lawn"""
+PROMPT3="Modern minimalist three houses with sleek geometric designs. Large glass windows and sliding doors integrated into the architecture, featuring wood, white stucco, and dark metal finishes. Houses include clean lines, flat or slightly angled roofs, and landscaped surroundings with wooden decks, patios, or modern walkways. Emphasize contemporary lighting, open spaces, and a harmonious blend of natural materials and modern aesthetic"
 
 def get_control_image(model_name):
     """Select appropriate control image based on model name"""
     control_images = {
-        'depth': ("control_image_depth.png", load_image("../imgs/control_images/control_image_depth.png")),
-        'canny': ("control_image_edges.png", load_image("../imgs/control_images/control_image_edges.png")),
-        'normals': ("control_image_normals.png", load_image("../imgs/control_images/control_image_normals.png"))
+        'depth': ("one_depth.png", load_image("../imgs/control_images/one_depth.png")),
+        'canny': ("one_edges.png", load_image("../imgs/control_images/one_edges.png")),
+        'normals': ("one_normals.png", None),  # Preprocessor will be used
+        'screenshot': ("one_screenshot.png", None)  # Preprocessor will be used
     }
     
     if 'depth' in model_name.lower():
@@ -52,12 +56,18 @@ def get_control_image(model_name):
         return control_images['canny']
     elif 'normals' in model_name.lower():
         return control_images['normals']
-    else:
+    elif 'screenshot' in model_name.lower():
+        return control_images['screenshot']
         print(f"Unknown control image for model: {model_name}")
         return None, None
 
 def load_pipeline(controlnet_model):
     """Load the pipeline with specified controlnet model"""
+    if 'normals' in controlnet_model.lower():
+        processor = DepthPreprocessor.from_pretrained("LiheYoung/depth-anything-large-hf")
+    elif 'screenshot' in controlnet_model.lower():
+        processor = CannyDetector()
+
     controlnet = FluxControlNetModel.from_pretrained(
         controlnet_model, 
         torch_dtype=torch.bfloat16
@@ -74,7 +84,7 @@ def load_pipeline(controlnet_model):
     print(f"Pipeline device map: {pipe.hf_device_map}")
     print(f"Controlnet device: {controlnet.device}")
     
-    return pipe
+    return pipe, processor
 
 def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_steps,
                    guidance_scale, control_guidance_end,
@@ -96,7 +106,7 @@ def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_ste
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
-    base_name = f"{timestamp}_{image_index:04d}_c{conditioning_scale}_s{num_steps}_g{guidance_scale}_cge{control_guidance_end}"
+    base_name = f"{timestamp}_{model_name}_{image_index:04d}_c{conditioning_scale}_s{num_steps}_g{guidance_scale}_cge{control_guidance_end}"
 
     # Save image
     image_path = f"../imgs/{model_name}/{base_name}.png"
@@ -160,9 +170,22 @@ def main(model_index):
         model_name = model.replace("/", "-")
         ensure_params_dir(model_name)
 
-        pipe = load_pipeline(model)
+        pipe, processor = load_pipeline(model)
         control_image_name, control_image = get_control_image(model)
-                    
+
+        if processor and control_image is None:
+            input_path = f"../imgs/control_images/{control_image_name}"
+            control_image = load_image(input_path)
+            if 'normals' in model.lower():
+                control_image = processor(control_image)[0].convert("RGB")
+            elif 'screenshot' in model.lower():
+                control_image = processor(
+                    control_image,
+                    low_threshold=50,
+                    high_threshold=200,
+                    detect_resolution=1024,
+                    image_resolution=1024
+                )
         for prompt_text, cond_scale, steps, guidance, control_guidance_end in param_combinations:
             try:
                 generate_image(
