@@ -98,12 +98,12 @@ def get_control_images(model_name):
         preproc = image_info["preproc"]
 
         input_path = f"{IMGS_BASE_PATH}/control_images/{file_name}"
+        base_name, ext = os.path.splitext(file_name)
 
         if preproc == "no":
-            processed_images.append(input_path)
+            processed_images.append((input_path, f"{base_name}_no"))
             continue
 
-        base_name, ext = os.path.splitext(file_name)
         output_path = f"{IMGS_BASE_PATH}/control_images/processed_{base_name}_{control_type}{ext}"
 
         if not os.path.exists(output_path):
@@ -131,7 +131,7 @@ def get_control_images(model_name):
         else:
             print(f"Using existing processed image: {output_path}")
 
-        processed_images.append(output_path)
+        processed_images.append((output_path, f"{base_name}_proc{control_type}"))
 
     del processor
     torch.cuda.empty_cache()
@@ -160,7 +160,7 @@ def load_pipeline(controlnet_model):
 
 def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_steps,
                    guidance_scale, control_guidance_end,
-                   image_index, control_image_name, model_name):
+                   image_index, control_image_name, model_name, control_image_tag):
     """Generate image with specified parameters"""
     width, height = control_image.size
     
@@ -178,7 +178,7 @@ def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_ste
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
-    base_name = f"{timestamp}_{model_name}_{image_index:04d}_c{conditioning_scale}_s{num_steps}_g{guidance_scale}_cge{control_guidance_end}"
+    base_name = f"{timestamp}_{model_name}_{control_image_tag}_{image_index:04d}_c{conditioning_scale}_s{num_steps}_g{guidance_scale}_cge{control_guidance_end}"
 
     # Save image
     image_path = f"{IMGS_BASE_PATH}/{model_name}/{base_name}.png"
@@ -244,11 +244,11 @@ def main(model_index):
         model_name = model.replace("/", "-")
         ensure_params_dir(model_name)
 
-        control_image_paths = get_control_images(model)
+        control_images = get_control_images(model)
 
         pipe = load_pipeline(model)
 
-        for control_image_path in control_image_paths:
+        for control_image_path, control_image_tag in control_images:
             control_image = load_image(control_image_path)
 
             for prompt_text, cond_scale, steps, guidance, control_guidance_end in param_combinations:
@@ -263,7 +263,8 @@ def main(model_index):
                         control_guidance_end,
                         image_counter,
                         control_image_path,
-                        model_name
+                        model_name,
+                        control_image_tag
                     )
 
                     image_counter += 1
