@@ -237,11 +237,10 @@ def main(model_index):
         ensure_params_dir(model_name)
 
         pipe = load_pipeline(model)
-        control_image_names = get_control_images(model)
+        control_image_paths = get_control_images(model)
 
-        for control_image_name in control_image_names:
-            input_path = f"../imgs/control_images/{control_image_name}"
-            control_image = load_image(input_path)
+        for control_image_path in control_image_paths:
+            control_image = load_image(control_image_path)
 
             for prompt_text, cond_scale, steps, guidance, control_guidance_end in param_combinations:
                 try:
@@ -254,7 +253,7 @@ def main(model_index):
                         guidance,
                         control_guidance_end,
                         image_counter,
-                        control_image_name,
+                        control_image_path,
                         model_name
                     )
 
