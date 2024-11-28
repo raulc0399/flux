@@ -240,6 +240,8 @@ def main(model_index):
         control_guidance_end_vals
     )
 
+    param_combinations = list(param_combinations)
+
     try:
         model_name = model.replace("/", "-")
         ensure_params_dir(model_name)
