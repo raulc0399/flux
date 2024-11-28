@@ -206,6 +206,9 @@ def ensure_params_dir(model):
     os.makedirs(params_dir, exist_ok=True)
 
 def main(model_index):
+    model = MODELS[model_index]
+    print(f"Generating images for model: {model}")
+
     image_counter = 0
     
     # Parameter combinations
@@ -236,8 +239,7 @@ def main(model_index):
         guidance_scales,
         control_guidance_end_vals
     )
-    
-    model = MODELS[model_index]
+
     try:
         model_name = model.replace("/", "-")
         ensure_params_dir(model_name)
