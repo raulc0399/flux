@@ -104,7 +104,7 @@ def get_control_images(model_name):
             continue
 
         base_name, ext = os.path.splitext(file_name)
-        output_path = f"{IMGS_BASE_PATH}/control_images/processed_{base_name}_{control_type}.{ext}"
+        output_path = f"{IMGS_BASE_PATH}/control_images/processed_{base_name}_{control_type}{ext}"
 
         if not os.path.exists(output_path):
             control_image = load_image(input_path)
