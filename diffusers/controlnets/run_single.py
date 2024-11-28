@@ -241,8 +241,9 @@ def main(model_index):
         model_name = model.replace("/", "-")
         ensure_params_dir(model_name)
 
-        pipe = load_pipeline(model)
         control_image_paths = get_control_images(model)
+
+        pipe = load_pipeline(model)
 
         for control_image_path in control_image_paths:
             control_image = load_image(control_image_path)
