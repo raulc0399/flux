@@ -1,6 +1,6 @@
 import torch
 from diffusers.utils import load_image
-from controlnet_aux import CannyDetector
+from controlnet_aux import CannyDetector, NormalBaeDetector
 from image_gen_aux import DepthPreprocessor
 from diffusers import FluxControlNetPipeline, FluxControlNetModel
 from datetime import datetime
@@ -9,9 +9,32 @@ import json
 import os
 import sys
 
+IMGS_BASE_PATH = "../imgs"
+
+CONTROL_IMAGES = {
+    'depth': [
+        {"file": "one_depth.png", "preproc": "no"},
+        {"file": "one_normals.png", "preproc": "yes"},
+        {"file": "one_screenshot.png", "preproc": "yes"}
+    ],
+    'normals': [
+        {"file": "one_normals.png", "preproc": "no"},
+        {"file": "one_screenshot.png", "preproc": "yes"},
+    ],
+    'canny': [
+        {"file": "one_edges_bw_10.png", "preproc": "no"},
+        {"file": "one_edges_bw_20.png", "preproc": "no"},
+        {"file": "one_edges_bw_30.png", "preproc": "no"},
+        {"file": "one_edges_bw_40.png", "preproc": "no"},
+        {"file": "one_edges.png", "preproc": "no"},
+        {"file": "one_normals.png", "preproc": "yes"},
+        {"file": "one_screenshot.png", "preproc": "yes"}
+    ]
+}
+
+# "Xlabs-AI/flux-controlnet-canny-diffusers",
+# "Xlabs-AI/flux-controlnet-depth-diffusers",
 MODELS = [
-    "Xlabs-AI/flux-controlnet-canny-diffusers",
-    "Xlabs-AI/flux-controlnet-depth-diffusers",
     "jasperai/Flux.1-dev-Controlnet-Depth",
     "jasperai/Flux.1-dev-Controlnet-Surface-Normals",
     "promeai/FLUX.1-controlnet-lineart-promeai",
@@ -39,35 +62,78 @@ Natural lens flare and soft evening lighting. Architectural visualization style 
 # PROMPT3="""Architecture photography of a row of houses with a black railings on the balcony, white exterior, warm sunny day, natural lens flare. the houses are on a private street, surronded by a clean lawn"""
 PROMPT3="Modern minimalist three houses with sleek geometric designs. Large glass windows and sliding doors integrated into the architecture, featuring wood, white stucco, and dark metal finishes. Houses include clean lines, flat or slightly angled roofs, and landscaped surroundings with wooden decks, patios, or modern walkways. Emphasize contemporary lighting, open spaces, and a harmonious blend of natural materials and modern aesthetic"
 
-def get_control_image(model_name):
-    """Select appropriate control image based on model name"""
-    control_images = {
-        'depth': ("one_depth.png", load_image("../imgs/control_images/one_depth.png")),
-        'canny': ("one_edges.png", load_image("../imgs/control_images/one_edges.png")),
-        'normals': ("one_normals.png", None),  # Preprocessor will be used
-        'screenshot': ("one_screenshot.png", None)  # Preprocessor will be used
-    }
+def get_control_images(model_name):
+    def get_control_type(model_name):
+        if 'depth' in model_name.lower():
+            return 'depth'
+        elif 'canny' in model_name.lower():
+            return 'canny'
+        elif 'lineart' in model_name.lower():
+            return 'canny'
+        elif 'normals' in model_name.lower():
+            return 'normals'
+        else:
+            print(f"Unknown control image type for model: {model_name}")
+            return None
     
-    if 'depth' in model_name.lower():
-        return control_images['depth']
-    elif 'canny' in model_name.lower():
-        return control_images['canny']
-    elif 'lineart' in model_name.lower():
-        return control_images['canny']
-    elif 'normals' in model_name.lower():
-        return control_images['normals']
-    elif 'screenshot' in model_name.lower():
-        return control_images['screenshot']
-        print(f"Unknown control image for model: {model_name}")
-        return None, None
+    control_type = get_control_type(model_name)
+    images_for_model = CONTROL_IMAGES[control_type]
+
+    processor = None
+    if control_type == "canny":
+        processor = CannyDetector()
+    elif control_type == "depth":
+        processor = DepthPreprocessor.from_pretrained("LiheYoung/depth-anything-large-hf")
+        processor.to("cuda")
+    elif control_type == "normals":
+        processor = NormalBaeDetector.from_pretrained("lllyasviel/Annotators")
+        processor.to("cuda")
+
+    if processor is None:
+        return images_for_model
+    
+    processed_images = []
+    for image_info in images_for_model:
+        file_name = image_info["file"]
+        preproc = image_info["preproc"]
+
+        input_path = f"{IMGS_BASE_PATH}/control_images/{file_name}"
+
+        if preproc == "no":
+            processed_images.append(input_path)
+            continue
+
+        output_path = f"{IMGS_BASE_PATH}/control_images/processed_{file_name}"
+
+        if not os.path.exists(output_path):
+            control_image = load_image(input_path)
+
+            if control_type == "canny":
+                processed_image = processor(
+                    control_image,
+                    low_threshold=50,
+                    high_threshold=200,
+                    detect_resolution=1024,
+                    image_resolution=1024
+                )
+
+            elif control_type == "depth":
+                processed_image = processor(control_image)[0].convert("RGB")
+
+            elif control_type == "normals":
+                processed_image = processor(control_image)
+
+            else:
+                processed_image = control_image
+
+            processed_image.save(output_path)
+
+        processed_images.append(output_path)
+
+    return processed_images
 
 def load_pipeline(controlnet_model):
     """Load the pipeline with specified controlnet model"""
-    if 'normals' in controlnet_model.lower():
-        processor = DepthPreprocessor.from_pretrained("LiheYoung/depth-anything-large-hf")
-    elif 'screenshot' in controlnet_model.lower():
-        processor = CannyDetector()
-
     controlnet = FluxControlNetModel.from_pretrained(
         controlnet_model, 
         torch_dtype=torch.bfloat16
@@ -84,7 +150,7 @@ def load_pipeline(controlnet_model):
     print(f"Pipeline device map: {pipe.hf_device_map}")
     print(f"Controlnet device: {controlnet.device}")
     
-    return pipe, processor
+    return pipe
 
 def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_steps,
                    guidance_scale, control_guidance_end,
@@ -109,7 +175,7 @@ def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_ste
     base_name = f"{timestamp}_{model_name}_{image_index:04d}_c{conditioning_scale}_s{num_steps}_g{guidance_scale}_cge{control_guidance_end}"
 
     # Save image
-    image_path = f"../imgs/{model_name}/{base_name}.png"
+    image_path = f"{IMGS_BASE_PATH}/{model_name}/{base_name}.png"
     image.save(image_path)
     
     # Save parameters
@@ -123,14 +189,14 @@ def generate_image(pipe, control_image, prompt_text, conditioning_scale, num_ste
         "prompt": prompt_text
     }
     
-    params_path = f"../imgs/{model_name}/params/{base_name}.json"
+    params_path = f"{IMGS_BASE_PATH}/{model_name}/params/{base_name}.json"
     with open(params_path, 'w') as f:
         json.dump(params, f, indent=4, separators=(',\n', ': '))
     
     print(f"Saved image: {image_path}")
 
 def ensure_params_dir(model):
-    params_dir = f"../imgs/{model}/params"
+    params_dir = f"{IMGS_BASE_PATH}/{model}/params"
     os.makedirs(params_dir, exist_ok=True)
 
 def main(model_index):
@@ -170,42 +236,33 @@ def main(model_index):
         model_name = model.replace("/", "-")
         ensure_params_dir(model_name)
 
-        pipe, processor = load_pipeline(model)
-        control_image_name, control_image = get_control_image(model)
+        pipe = load_pipeline(model)
+        control_image_names = get_control_images(model)
 
-        if processor and control_image is None:
+        for control_image_name in control_image_names:
             input_path = f"../imgs/control_images/{control_image_name}"
             control_image = load_image(input_path)
-            if 'normals' in model.lower():
-                control_image = processor(control_image)[0].convert("RGB")
-            elif 'screenshot' in model.lower():
-                control_image = processor(
-                    control_image,
-                    low_threshold=50,
-                    high_threshold=200,
-                    detect_resolution=1024,
-                    image_resolution=1024
-                )
-        for prompt_text, cond_scale, steps, guidance, control_guidance_end in param_combinations:
-            try:
-                generate_image(
-                    pipe,
-                    control_image,
-                    prompt_text,
-                    cond_scale,
-                    steps,
-                    guidance,
-                    control_guidance_end,
-                    image_counter,
-                    control_image_name,
-                    model_name
-                )
 
-                image_counter += 1
+            for prompt_text, cond_scale, steps, guidance, control_guidance_end in param_combinations:
+                try:
+                    generate_image(
+                        pipe,
+                        control_image,
+                        prompt_text,
+                        cond_scale,
+                        steps,
+                        guidance,
+                        control_guidance_end,
+                        image_counter,
+                        control_image_name,
+                        model_name
+                    )
 
-            except Exception as e:
-                print(f"Error generating image for {model} with params: {cond_scale}, {steps}, {guidance}")
-                print(f"Error: {str(e)}")
+                    image_counter += 1
+
+                except Exception as e:
+                    print(f"Error generating image for {model} with params: {cond_scale}, {steps}, {guidance}")
+                    print(f"Error: {str(e)}")
 
         # clear gpu
         del pipe
