@@ -6,9 +6,10 @@ from diffusers.utils import load_image
 from pathlib import Path
 
 # Global configuration
+IMGS_BASE_PATH = Path("../imgs")
 BASE_MODEL = "black-forest-labs/FLUX.1-Depth-dev"
-INPUT_DIR = Path("../imgs/control_images")
-OUTPUT_DIR = Path("../imgs/flux-depth")
+INPUT_DIR = IMGS_BASE_PATH / "control_images"
+OUTPUT_DIR = IMGS_BASE_PATH / "flux-depth"
 INFERENCE_STEPS = [30, 40, 50]
 GUIDANCE_SCALES = [4, 7, 10, 30]
 PROMPT = "Modern minimalist three houses with sleek geometric designs. Large glass windows and sliding doors integrated into the architecture, featuring wood, white stucco, and dark metal finishes. Houses include clean lines, flat or slightly angled roofs, and landscaped surroundings with wooden decks, patios, or modern walkways. Emphasize contemporary lighting, open spaces, and a harmonious blend of natural materials and modern aesthetic"
