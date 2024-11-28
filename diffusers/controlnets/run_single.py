@@ -246,6 +246,8 @@ def main(model_index):
 
         control_images = get_control_images(model)
 
+        print(f"using images: {control_images}")
+
         pipe = load_pipeline(model)
 
         for control_image_path, control_image_tag in control_images:
