@@ -127,8 +127,13 @@ def get_control_images(model_name):
                 processed_image = control_image
 
             processed_image.save(output_path)
+        else:
+            print(f"Using existing processed image: {output_path}")
 
         processed_images.append(output_path)
+
+    del processor
+    torch.cuda.empty_cache()
 
     return processed_images
 
