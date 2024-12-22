@@ -1,4 +1,5 @@
 diffusers_env
 .*.swp
-output_*
-output.png
+output/
+output
+loras/

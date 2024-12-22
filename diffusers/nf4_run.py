@@ -3,6 +3,7 @@ import gc
 
 from transformers import T5EncoderModel
 from diffusers import FluxPipeline, FluxTransformer2DModel
+from datetime import datetime
 
 def flush():
     gc.collect()
@@ -31,14 +32,17 @@ pipeline = FluxPipeline.from_pretrained(ckpt_id, text_encoder=None, text_encoder
 pipeline.enable_model_cpu_offload()
 
 print("Loading LoRA weights.")
-pipeline.load_lora_weights("./1.safetensors")
-# print("Fusing LoRA.")
-# pipeline.fuse_lora()
+pipeline.load_lora_weights("./loras/009.safetensors")
+print("Fusing LoRA.")
+pipeline.fuse_lora()
 # print("Unloading LoRA weights.")
 # pipeline.unload_lora_weights()
 
 print("Running denoising.")
 height, width = 512, 768
-images = pipeline(prompt_embeds=prompt_embeds, pooled_prompt_embeds=pooled_prompt_embeds, num_inference_steps=50, guidance_scale=5.5, height=height, width=width, output_type="pil").images
+images = pipeline(prompt_embeds=prompt_embeds, pooled_prompt_embeds=pooled_prompt_embeds, 
+                  num_inference_steps=50, guidance_scale=5.5,
+                  height=height, width=width, output_type="pil").images
 
-images[0].save("output.png")
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+images[0].save(f"./output/{timestamp}_output.png")
