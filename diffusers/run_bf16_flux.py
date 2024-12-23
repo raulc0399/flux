@@ -4,12 +4,14 @@ from datetime import datetime
 
 pipe = FluxPipeline.from_pretrained("black-forest-labs/FLUX.1-dev", torch_dtype=torch.bfloat16) # can replace schnell with dev
 
-# to run on low vram GPUs (i.e. between 4 and 32 GB VRAM)
-pipe.enable_sequential_cpu_offload()
-pipe.vae.enable_slicing()
-pipe.vae.enable_tiling()
+# pipe.enable_model_cpu_offload()
 
-pipe.to(torch.float16) # casting here instead of in the pipeline constructor because doing so in the constructor loads all models into CPU memory at once
+# to run on low vram GPUs (i.e. between 4 and 32 GB VRAM)
+# pipe.enable_sequential_cpu_offload()
+# pipe.vae.enable_slicing()
+# pipe.vae.enable_tiling()
+
+pipe.to(torch.bfloat16) # casting here instead of in the pipeline constructor because doing so in the constructor loads all models into CPU memory at once
 
 prompt = "A cat holding a sign that says hello world"
 out = pipe(
